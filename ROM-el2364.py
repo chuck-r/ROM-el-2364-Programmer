@@ -33,13 +33,15 @@ action           Can be one of write, read, or verify
 start_address    Starting address for the operation. This is in hex format
                  and may optionally be preceeded by '0x'
 
-end_address      The last hex address to read or write, optionally preceeded by
-                 '0x'. If specified, the program will stop the read/verify/write
-                 operation after this address. The default is 0xFFFF or, if a
-                 file is specified, it will be start_address + the length of the
-                 file (in bytes).
+end_address      The address at which to end the operation, optionally preceeded
+                 by '0x'. The default is 0x10000 or, if a file is specified, it
+                 will default to start_address + the length of the file (in
+                 bytes). NOTE: The end_address is non-inclusive; the address is
+                 never actually altered or read (i.e., an address range of of
+                 0x0c00 to 0x0e00 will read/write addresses 0x0c00 to 0x0cff).
 
-filename         The file to write to or verify against the EEPROM'''
+filename         The file to write to (read mode), read from (write mode), or
+                 verify against (verify mode) the EEPROM'''
 
 args={'mode':'','do_verify':False,'start_address':-1,'end_address':-1,'filename':''}
 
@@ -247,26 +249,6 @@ def read_range(start, end, ser, dump=True, file=None):
     print()
     hexdigest = hash.hexdigest();
     return hexdigest
-
-#print("Setting up serial.")
-#ser = serial.Serial('/dev/ttyACM0', 115200, timeout=30);
-#print("Waiting for Arduino...");
-#while ser.in_waiting < 4:
-#    continue
-#print("4 bytes available.")
-#data = ser.read(4);
-#if data != b'INIT':
-#    print("ERROR: Unexpected response from Arduino:")
-#    print(data);
-#    os.exit(1)
-
-#print("sending test read.")
-#for i in range(0,1000):
-#    print("sending: " + str(b'\x03R') + str(i.to_bytes(2,'big')))
-#    ser.write(b'\x03R' + i.to_bytes(2,'big'))
-#    print(ser.readline().decode());
-#    response = ser.read(1);
-#    print("response: " + str(response));
 
 if args['mode'] == 'read':
     if len(args['filename']) != 0:
